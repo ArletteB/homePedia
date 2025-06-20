@@ -45,10 +45,10 @@ spark-worker-stop: ## Stoppe le worker Spark
 # -- Services --
 
 start-services: ## Démarre les services
-	$(DOCKER) up -d scraper-bienici scraper-seloger scraper-gouv spark-job
+	$(DOCKER) up -d scraper-bienici scraper-seloger scraper-gouv spark-job streamlit
 
 stop-services: ## Stoppe les services
-	$(DOCKER) down -v scraper-bienici scraper-seloger scraper-gouv spark-job
+	$(DOCKER) down -v scraper-bienici scraper-seloger scraper-gouv spark-job streamlit
 
 # -- Composants individuels --
 
@@ -63,8 +63,11 @@ run-spark: ## Lance le job PySpark principal
 
 run-ui: ## Lance l'application Streamlit (UI)
 	@echo "▶ Démarrage de l’interface Streamlit..."
-	$(DOCKER) exec -it streamlit streamlit run streamlit_app/app.py
+	$(DOCKER) up -d streamlit
 
+streamlit-stop: ## Stoppe l'application Streamlit
+	$(DOCKER) down -v streamlit
+	
 # -- Nettoyage --
 
 clean: ## Nettoyage des fichiers générés (raw/processed/exports)
