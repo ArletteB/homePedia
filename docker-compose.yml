@@ -1,34 +1,4 @@
 services:
-  # mongodb:
-  #   image: mongo:8.0.6
-  #   container_name: global-mongodb
-  #   env_file:
-  #     - .env
-  #   command: mongod --bind_ip_all
-  #   volumes:
-  #     - ./mongodb_data:/data/db
-  #   ports:
-  #     - "27017:27017"
-  #   restart: unless-stopped
-  # postgres:
-  #   image: postgres:latest
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - ./postgres:/var/lib/postgresql/data
-  #     - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-  #   environment:
-  #     - POSTGRES_PASSWORD=admin
-  #     - POSTGRES_USER=admin
-  #     - POSTGRES_DB=seloger_db
-  #   networks:
-  #     - spark-network
-  #   healthcheck:
-  #     test: [ "CMD-SHELL", "pg_isready -U admin" ]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-
   spark-master:
     build:
       context: .
