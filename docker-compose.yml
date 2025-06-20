@@ -1,0 +1,164 @@
+services:
+  # mongodb:
+  #   image: mongo:8.0.6
+  #   container_name: global-mongodb
+  #   env_file:
+  #     - .env
+  #   command: mongod --bind_ip_all
+  #   volumes:
+  #     - ./mongodb_data:/data/db
+  #   ports:
+  #     - "27017:27017"
+  #   restart: unless-stopped
+  # postgres:
+  #   image: postgres:latest
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - ./postgres:/var/lib/postgresql/data
+  #     - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  #   environment:
+  #     - POSTGRES_PASSWORD=admin
+  #     - POSTGRES_USER=admin
+  #     - POSTGRES_DB=seloger_db
+  #   networks:
+  #     - spark-network
+  #   healthcheck:
+  #     test: [ "CMD-SHELL", "pg_isready -U admin" ]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  spark-master:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile-spark
+    container_name: spark-master
+    environment:
+      - SPARK_MODE=master
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    volumes:
+      - ./scraper:/opt/bitnami/spark/work
+      - ./postgresql-42.2.18.jar:/opt/bitnami/spark/jars/postgresql-42.2.18.jar
+    networks:
+      - spark-network
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4g
+
+  spark-worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile-spark
+    environment:
+      - SPARK_MODE=worker
+    env_file:
+      - .env
+    volumes:
+      - ./scraper:/opt/bitnami/spark/work
+      - ./postgresql-42.2.18.jar:/opt/bitnami/spark/jars/postgresql-42.2.18.jar
+    networks:
+      - spark-network
+    deploy:
+      mode: replicated
+      replicas: 2
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4g
+
+  spark-job:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile-spark
+    container_name: spark-job
+    volumes:
+      - ./spark_jobs:/opt/bitnami/spark/work/spark_jobs
+      - ./requirements.txt:/opt/bitnami/spark/work/requirements.txt
+      - ./postgresql-42.2.18.jar:/opt/bitnami/spark/jars/postgresql-42.2.18.jar
+    command: [
+      "spark-submit",
+      "--master", "spark://spark-master:7077",
+      "--packages", "org.mongodb.spark:mongo-spark-connector_2.12:10.2.1,org.postgresql:postgresql:42.6.0",
+      "spark_jobs/preprocess_data.py"
+    ]
+    depends_on:
+      - spark-master
+    networks:
+      - spark-network
+
+  scraper-seloger:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.scraper
+    env_file:
+      - .env
+    environment:
+      - SPIDER_SCRIPT=run_seloger_spiders.py
+    volumes:
+      - ./scraper:/opt/bitnami/spark/work
+      - ./postgresql-42.2.18.jar:/opt/bitnami/spark/jars/postgresql-42.2.18.jar
+    networks:
+      - spark-network
+    depends_on:
+      spark-master:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2g
+
+  scraper-bienici:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.scraper
+    env_file:
+      - .env
+    environment:
+      - SPIDER_SCRIPT=run_bienici_spiders.py
+    volumes:
+      - ./scraper:/opt/bitnami/spark/work
+      - ./postgresql-42.2.18.jar:/opt/bitnami/spark/jars/postgresql-42.2.18.jar
+    networks:
+      - spark-network
+    depends_on:
+      spark-master:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2g
+
+  scraper-gouv:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.scraper
+    env_file:
+      - .env
+    environment:
+      - SPIDER_SCRIPT=run_gouv_spiders.py
+    volumes:
+      - ./scraper:/opt/bitnami/spark/work
+      - ./postgresql-42.2.18.jar:/opt/bitnami/spark/jars/postgresql-42.2.18.jar
+    networks:
+      - spark-network
+    depends_on:
+      spark-master:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2g
+
+networks:
+  spark-network:
+    driver: bridge

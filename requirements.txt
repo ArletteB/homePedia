@@ -1,0 +1,8 @@
+scrapy>=2.11.0
+pyspark>=3.4.0
+psycopg2-binary>=2.9.9
+python-dotenv>=1.0.0
+sqlalchemy>=2.0.0
+pymongo>=4.0.0
+scrapy-fake-useragent>=1.4.4
+pandas>=2.2.3

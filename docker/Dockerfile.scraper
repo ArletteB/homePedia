@@ -1,0 +1,7 @@
+FROM bitnami/spark:latest
+
+RUN pip install scrapy pyspark psycopg2-binary python-dotenv scrapy-fake-useragent pymongo tqdm
+
+WORKDIR /opt/bitnami/spark/work
+
+CMD ["/bin/bash", "-c", "python ${SPIDER_SCRIPT}"]

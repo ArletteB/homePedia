@@ -1,0 +1,22 @@
+project_name: HomePedia
+
+paths:
+  raw_data: "data/raw"
+  processed_data: "data/processed"
+  exports: "data/exports"
+
+scraper:
+  max_pages: 100
+  page_size: 25
+  sleep_between_requests: 1.5
+
+spark:
+  master_url: "spark://spark-master:7077"
+  driver_memory: "3g"
+
+visualization:
+  enable_map: true
+  default_city: "Bordeaux"
+
+# nlp:
+#   sentiment_threshold: 0.1
