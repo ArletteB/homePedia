@@ -9,5 +9,7 @@ pandas>=2.2.3
 streamlit>=1.30
 streamlit-folium>=0.15
 folium>=0.15
+pytest>=8.0
+flake8>=7.0
 plotly>=5.20
 geopandas>=0.14

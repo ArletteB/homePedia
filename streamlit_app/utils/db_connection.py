@@ -1,46 +1,82 @@
+import os
 import psycopg2
+from psycopg2.pool import SimpleConnectionPool
 import pandas as pd
+import streamlit as st
 from config import POSTGRES_CONFIG
 
-# Fonction pour établir la connexion PostgreSQL
+# Pool de connexions initialisé au premier appel
+_POOL = None
+
+
+def _init_pool():
+    """Initialise le pool de connexions si nécessaire."""
+    global _POOL
+    if _POOL is None:
+        try:
+            _POOL = SimpleConnectionPool(
+                1,
+                int(os.getenv("DB_POOL_SIZE", 5)),
+                host=POSTGRES_CONFIG["host"],
+                port=POSTGRES_CONFIG["port"],
+                database=POSTGRES_CONFIG["database"],
+                user=POSTGRES_CONFIG["user"],
+                password=POSTGRES_CONFIG["password"],
+            )
+        except Exception as exc:
+            raise ConnectionError(f"Database connection failed: {exc}")
+
+
 def get_connection():
-    conn = psycopg2.connect(
-        host=POSTGRES_CONFIG['host'],
-        port=POSTGRES_CONFIG['port'],
-        database=POSTGRES_CONFIG['database'],
-        user=POSTGRES_CONFIG['user'],
-        password=POSTGRES_CONFIG['password']
-    )
-    return conn
+    _init_pool()
+    try:
+        return _POOL.getconn()
+    except Exception as exc:
+        raise ConnectionError(f"Unable to obtain DB connection: {exc}")
+
+
+def release_connection(conn):
+    if conn is not None and _POOL:
+        _POOL.putconn(conn)
 
 # Fonction pour charger les données selon les filtres
-def load_data(filters):
+def build_query(filters):
+    """Construit la requête SQL en fonction des filtres."""
     query = """
         SELECT * FROM real_estate
         WHERE 1=1
     """
     params = []
 
-    if filters['city']:
+    if filters.get("city"):
         query += " AND LOWER(location) LIKE %s"
         params.append(f"%{filters['city'].lower()}%")
 
-    if filters['property_type'] != "Tous":
+    if filters.get("property_type") and filters["property_type"] != "Tous":
         query += " AND LOWER(property_type) = %s"
-        params.append(filters['property_type'].lower())
+        params.append(filters["property_type"].lower())
 
-    if filters['price_min'] and filters['price_max']:
+    if filters.get("price_min") and filters.get("price_max"):
         query += " AND price BETWEEN %s AND %s"
-        params.append(filters['price_min'])
-        params.append(filters['price_max'])
+        params.append(filters["price_min"])
+        params.append(filters["price_max"])
 
-    if filters['start_date'] and filters['end_date']:
+    if filters.get("start_date") and filters.get("end_date"):
         query += " AND scraped_at BETWEEN %s AND %s"
-        params.append(filters['start_date'])
-        params.append(filters['end_date'])
+        params.append(filters["start_date"])
+        params.append(filters["end_date"])
 
+    query += " LIMIT 1000"
+    return query, params
+
+
+@st.cache_data(show_spinner=False)
+def load_data(filters):
+    query, params = build_query(filters)
     conn = get_connection()
-    df = pd.read_sql_query(query, conn, params=params)
-    conn.close()
+    try:
+        df = pd.read_sql_query(query, conn, params=params)
+    finally:
+        release_connection(conn)
 
     return df

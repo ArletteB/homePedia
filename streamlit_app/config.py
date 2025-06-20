@@ -22,5 +22,14 @@ MONGO_CONFIG = {
     "password": os.getenv("MONGO_PASSWORD"),
 }
 # config.py
-MAPBOX_TOKEN = "your-mapbox-token"
-DATA_PATH = "data/"
+MAPBOX_TOKEN = os.getenv("MAPBOX_TOKEN")
+DATA_PATH = os.getenv("DATA_PATH", "data/")
+
+REQUIRED_VARS = ["host", "database", "user", "password"]
+missing = [v for v in REQUIRED_VARS if not POSTGRES_CONFIG.get(v)]
+if missing:
+    missing_str = ", ".join(missing)
+    raise ValueError(f"Missing PostgreSQL configuration variables: {missing_str}")
+
+if not MAPBOX_TOKEN:
+    raise ValueError("MAPBOX_TOKEN environment variable is not set")

@@ -13,7 +13,8 @@ st.title("Catalogue des annonces")
 
 # Tentative de chargement des données depuis PostgreSQL
 try:
-    df = load_data(filters)
+    with st.spinner("Chargement des données..."):
+        df = load_data(filters)
     st.success("Connexion PostgreSQL établie")
 except Exception as e:
     st.error(f"Erreur lors de la connexion à PostgreSQL : {e}")
