@@ -3,6 +3,7 @@
 *.pdf
 *.json
 data
+!streamlit_app/data/
 .DS_Store
 
 bootstrap_data
