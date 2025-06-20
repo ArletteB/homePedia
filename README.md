@@ -59,7 +59,8 @@ T-DAT-902-HomePedia/
 make build        # Build toutes les images
 make start        # Lance tous les services (Attention : peut créer des problèmes entre les services)
 make stop         # Stoppe les services
-make run-ui       # Lance l'interface Streamlit
+make run-ui       # Démarre le conteneur Streamlit
+make streamlit-stop   # Arrête le conteneur Streamlit
 make clean-all    # Supprime les fichiers de données (data/)
 make seed-data    # Génère des données de test JSON
 make run-spark    # Exécute les jobs PySpark (recommendée après le scraping)

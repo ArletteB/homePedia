@@ -129,6 +129,20 @@ services:
           cpus: '2.0'
           memory: 2g
 
+  streamlit:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile-streamlit
+    container_name: streamlit
+    env_file:
+      - .env
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./streamlit_app:/app/streamlit_app
+    networks:
+      - spark-network
+
 networks:
   spark-network:
     driver: bridge
