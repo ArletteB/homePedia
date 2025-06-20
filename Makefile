@@ -100,7 +100,13 @@ test-pyspark: ## Teste localement preprocessing Spark
 	python3 spark_jobs/preprocessing.py
 
 test-ui: ## Lance Streamlit localement hors Docker
-	streamlit run streamlit_app/app.py
+        streamlit run streamlit_app/app.py
+
+	lint: ## Exécute flake8 sur le projet
+	flake8 streamlit_app tests
+
+	test: ## Lance les tests unitaires
+	pytest -q
 
 # -- Meta --
 
