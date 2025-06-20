@@ -4,6 +4,7 @@ from streamlit_folium import st_folium
 import pandas as pd
 import geopandas as gpd
 from config import DATA_PATH
+from pathlib import Path
 
 st.set_page_config(page_title="Carte Interactive", layout="wide")
 
@@ -12,8 +13,24 @@ st.title("🗺️ Carte Interactive du Marché Immobilier")
 # Chargement des données géographiques (GeoJSON ou shapefile converti)
 @st.cache_data
 def load_data():
-    gdf = gpd.read_file(f"{DATA_PATH}/departements.geojson")
-    df_indicateurs = pd.read_csv(f"{DATA_PATH}/indicateurs_immobilier.csv")
+    """Load geographic data and real estate indicators.
+
+    Display a Streamlit error if the files are missing instead of
+    raising an unhandled exception.
+    """
+    geo_path = Path(DATA_PATH) / "departements.geojson"
+    indic_path = Path(DATA_PATH) / "indicateurs_immobilier.csv"
+
+    if not geo_path.exists() or not indic_path.exists():
+        st.error(
+            f"Fichiers introuvables dans {DATA_PATH}. "
+            "Assurez-vous que 'departements.geojson' et "
+            "'indicateurs_immobilier.csv' sont présents."
+        )
+        st.stop()
+
+    gdf = gpd.read_file(geo_path)
+    df_indicateurs = pd.read_csv(indic_path)
     return gdf, df_indicateurs
 
 gdf, df_indicateurs = load_data()

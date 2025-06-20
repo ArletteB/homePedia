@@ -93,3 +93,11 @@ La partie *streamlit_app* se connecte désormais directement à la base
 PostgreSQL. Configurez les variables `DB_HOST`, `DB_PORT`, `DB_NAME`,
 `DB_USER` et `DB_PASSWORD` (voir `.env.example`) avant de lancer
 l'interface pour accéder aux données.
+
+### Données locales pour la carte interactive
+
+Certaines pages Streamlit utilisent des fichiers stockés en local,
+notamment `departements.geojson` et `indicateurs_immobilier.csv` pour la
+carte des départements. Par défaut, ces fichiers doivent se trouver dans
+le dossier `streamlit_app/data/`. Vous pouvez changer cet emplacement en
+définissant la variable d'environnement `DATA_PATH`.

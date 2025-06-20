@@ -23,7 +23,10 @@ MONGO_CONFIG = {
 }
 # config.py
 MAPBOX_TOKEN = os.getenv("MAPBOX_TOKEN")
-DATA_PATH = os.getenv("DATA_PATH", "data/")
+# Path to local data used by Streamlit pages
+# Defaults to the `data` directory located inside the `streamlit_app` package
+DEFAULT_DATA_PATH = os.path.join(os.path.dirname(__file__), "data")
+DATA_PATH = os.getenv("DATA_PATH", DEFAULT_DATA_PATH)
 
 REQUIRED_VARS = ["host", "database", "user", "password"]
 missing = [v for v in REQUIRED_VARS if not POSTGRES_CONFIG.get(v)]
