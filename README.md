@@ -52,6 +52,9 @@ T-DAT-902-HomePedia/
 ### Prérequis
 - Docker & Docker Compose
 - Python 3.10 (optionnel pour exécutions locales)
+- Certaines bibliothèques Python nécessaires à l'interface Streamlit
+  (streamlit, streamlit-folium, folium, plotly, geopandas) sont listées dans
+  `requirements.txt`
 
 ### Commandes utiles (via Makefile) :
 
