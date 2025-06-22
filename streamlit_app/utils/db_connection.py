@@ -80,3 +80,28 @@ def load_data(filters):
         release_connection(conn)
 
     return df
+
+
+def load_timeseries(city, start_date=None, end_date=None):
+    """Load average price per m2 by month for a city."""
+    query = """
+        SELECT DATE_TRUNC('month', "Date") AS month,
+               AVG("Price" / NULLIF("M2", 0)) AS price_m2
+        FROM real_estate
+        WHERE LOWER("City") = LOWER(%s)
+    """
+    params = [city]
+
+    if start_date and end_date:
+        query += " AND \"Date\" BETWEEN %s AND %s"
+        params.extend([start_date, end_date])
+
+    query += " GROUP BY month ORDER BY month"
+
+    conn = get_connection()
+    try:
+        df = pd.read_sql_query(query, conn, params=params)
+    finally:
+        release_connection(conn)
+
+    return df
