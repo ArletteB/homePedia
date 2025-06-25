@@ -124,6 +124,27 @@ def get_zipcode_stats(zipcode: int, logement_type: str = "total") -> pd.DataFram
     """
     return execute_query(query, [zipcode, logement_type])
 
+def get_all_department_stats(logement_type: str = "total") -> pd.DataFrame:
+    query = """
+        SELECT * FROM stats_department
+        WHERE logement_type = %s
+    """
+    return execute_query(query, [logement_type])
+
+def get_all_region_stats(logement_type: str = "total") -> pd.DataFrame:
+    query = """
+        SELECT * FROM stats_regions
+        WHERE logement_type = %s
+    """
+    return execute_query(query, [logement_type])
+
+def get_all_zipcode_stats(logement_type: str = "total") -> pd.DataFrame:
+    query = """
+        SELECT * FROM stats_zipcode
+        WHERE logement_type = %s
+    """
+    return execute_query(query, [logement_type])
+
 # Nouvelles fonctions pour charger les tables de correspondance
 @st.cache_data(show_spinner=False)
 def get_all_zipcodes() -> pd.DataFrame:
