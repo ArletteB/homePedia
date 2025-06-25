@@ -11,7 +11,10 @@ st.set_page_config(page_title="Carte des prix par département", layout="wide")
 # ---------------------------- PARAMÈTRES UI ----------------------------
 st.title("Prix moyen au m² par département")
 logement_type = st.selectbox("Type de logement", ["total", "maison", "appartement"], index=0)
-min_annonces = st.slider("Filtrer sur un nombre minimal d'annonces / département", 0, 50000, 1000, 5000)
+min_annonces = st.slider(
+    "Filtrer sur un nombre minimal d'annonces / département",
+    min_value=0, max_value=50000, step=5000, value=5000,
+)
 
 # ------------------------------ FONCTIONS ------------------------------
 @st.cache_data(show_spinner=False)
@@ -23,6 +26,7 @@ def load_stats(l_type: str, seuil: int) -> pd.DataFrame:
     """
     df = execute_query(query, [l_type, seuil])
     df["department_id"] = df["department_id"].astype(str).str.zfill(2)
+    df["department_id"] = df["department_id"].replace({"20": "2A", "201": "2A", "202": "2B"})
     return df
 
 @st.cache_data(show_spinner=False)
@@ -56,8 +60,11 @@ gdf = geo.merge(stats, left_on="code", right_on="department_id", how="inner")
 if gdf.empty:
     st.warning("Aucune donnée à afficher après la fusion GeoJSON + SQL.")
     st.dataframe(stats)
-    st.dataframe(geo[["code", "nom", "geometry"]])
+    st.dataframe(geo[["code", "nom"]])
     st.stop()
+
+# Debug : aperçu sans géométrie
+st.write("Extrait de la table fusionnée :", gdf.drop(columns=["geometry"]).head())
 
 # --------------------------- CRÉATION FOLIUM ---------------------------
 CENTRE_FRANCE = [46.5, 2.5]
