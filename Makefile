@@ -5,6 +5,8 @@
 PROJECT_NAME=homepedia
 DOCKER=docker compose
 
+# Chemin vers l'app Streamlit
+APP_ENTRY=streamlit_app/app.py
 # -- Actions globales --
 
 all: stop clean start logs ## Redémarre tout le projet (stop → clean → start → logs)
@@ -62,7 +64,7 @@ run-spark: ## Lance le job PySpark principal
 	$(DOCKER) run --rm spark-job
 
 run-ui: ## Lance l'application Streamlit (UI)
-	@echo "▶ Démarrage de l’interface Streamlit..."
+	@echo "▶ Lancement de $(PROJECT_NAME) depuis $(APP_ENTRY)..."
 	$(DOCKER) up -d streamlit
 
 streamlit-stop: ## Stoppe l'application Streamlit

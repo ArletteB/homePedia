@@ -13,16 +13,8 @@ POSTGRES_CONFIG = {
     "password": os.getenv("DB_PASSWORD"),
 }
 
-# Configuration optionnelle MongoDB si nécessaire (future évolution)
-MONGO_CONFIG = {
-    "host": os.getenv("MONGO_HOST"),
-    "port": int(os.getenv("MONGO_PORT", 27017)),
-    "database": os.getenv("MONGO_DB"),
-    "user": os.getenv("MONGO_USER"),
-    "password": os.getenv("MONGO_PASSWORD"),
-}
 # config.py
-MAPBOX_TOKEN = os.getenv("MAPBOX_TOKEN")
+MAPBOX_API_KEY = os.getenv("MAPBOX_API_KEY")
 # Path to local data used by Streamlit pages
 # Defaults to the `data` directory located inside the `streamlit_app` package
 DEFAULT_DATA_PATH = os.path.join(os.path.dirname(__file__), "data")
@@ -34,5 +26,6 @@ if missing:
     missing_str = ", ".join(missing)
     raise ValueError(f"Missing PostgreSQL configuration variables: {missing_str}")
 
-if not MAPBOX_TOKEN:
-    raise ValueError("MAPBOX_TOKEN environment variable is not set")
+if not MAPBOX_API_KEY:
+    raise ValueError("MAPBOX_API_KEY environment variable is not set")
+

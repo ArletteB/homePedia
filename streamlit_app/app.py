@@ -1,6 +1,11 @@
 import streamlit as st
 from components.sidebar import show_sidebar
 from utils.db_connection import get_connection
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 
 st.set_page_config(page_title="HomePedia", layout="wide")
 
