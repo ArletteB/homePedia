@@ -18,3 +18,5 @@ requests~=2.32.4
 altair~=5.5.0
 streamlit_folium~=0.25.0
 pydeck~=0.9.1
+pgeocode~=0.5.0
+geopy~=2.4.1
